@@ -1,0 +1,49 @@
+{
+  "name": "paydock_app",
+  "entryPointUriPath": "paydockapp",
+  "description": "Paydock app",
+  "icon": "https://media.licdn.com/dms/image/C4E0BAQH9BeoJVuol_g/company-logo_200_200/0/1669736543534/paydock_logo?e=1715212800&v=beta&t=frMnT8CFGtZGWlGDtddcefRRpxn6MorAvMh_2EGgGh4",
+  "permissions": ["view_products", "ViewProducts", "ManageProducts"],
+  "mainMenuLink": {
+    "defaultLabel": "Paydock plugin settings",
+    "uriPath": "https://jsp-test-six.vercel.app"
+  },
+  "submenuLinks": [
+    {
+      "defaultLabel": "Subpage 1",
+      "uriPath": "https://jsp-test-six.vercel.app",
+      "permissions": ["ViewProducts"]
+    },
+    {
+      "defaultLabel": "Subpage 2",
+      "uriPath": "https://jsp-test-six.vercel.app",
+      "permissions": ["ManageProducts"]
+    }
+  ],
+  "cloudIdentifier": "gcp-europe-west1",
+  "env": {
+    "production": {
+      "url": "https://jsp-test-six.vercel.app",
+      "mcApiUrl": "https://api.paydock-commercetool-app.jetsoftpro.dev"
+    },
+    "staging": {
+      "url": "https://jsp-test-six.vercel.app",
+      "mcApiUrl": "https://api.paydock-commercetool-app.jetsoftpro.dev"
+    }
+  },
+  "headers": {
+    "csp": {
+      "script-src": [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "https://auth.europe-west1.gcp.commercetools.com https://api.europe-west1.gcp.commercetools.com https://auth.europe-west1.gcp.commercetools.com/oauth/token https://api.paydock-commercetool-app.jetsoftpro.dev http://localhost:3003 http://localhost:3001"
+      ],
+      "content-src": [
+        "'self'",
+        "'unsafe-inline'",
+        "https://auth.europe-west1.gcp.commercetools.com https://api.europe-west1.gcp.commercetools.com https://auth.europe-west1.gcp.commercetools.com/oauth/token https://api.paydock-commercetool-app.jetsoftpro.dev http://localhost:3003 http://localhost:3001"
+      ]
+    }
+  }
+}
