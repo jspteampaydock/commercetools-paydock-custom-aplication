@@ -4,19 +4,23 @@ import {Pagination} from '@commercetools-uikit/pagination';
 import messages from './messages';
 import styles from './log.module.css';
 import './log.css';
+import axios from 'axios';
 import moment from 'moment';
 import {ContentNotification} from "@commercetools-uikit/notifications";
 import CommerceToolsAPIAdapter from '../../commercetools-api-adaptor';
 
 const LogsHistory = () => {
     const [error, setError] = useState(null);
+    const urlApi = 'https://api.paydock-commercetool-app.jetsoftpro.dev/';
+    // const urlApi = 'http://localhost:3003/';
     const [rows, setRows] = useState([]);
     const [currentRows, setCurrentRows] = useState([]);
+    const [sortedColumn, setSortedColumn] = useState(null);
+    const [sortOrder, setSortOrder] = useState('asc');
 
     const columns = [
-        {key: 'id', label: 'ID'},
-        {key: 'operation_id', label: 'Paydock Charge ID'},
         {key: 'date', label: 'Date'},
+        {key: 'operation_id', label: 'Paydock Charge ID'},
         {key: 'operation', label: 'Operation'},
         {key: 'status', label: 'Status'},
         {key: 'message', label: 'Message'},
@@ -38,8 +42,33 @@ const LogsHistory = () => {
     useEffect(() => {
         const lastRowIndex = page * perPage;
         const firstRowIndex = lastRowIndex - perPage;
-        setCurrentRows(rows.slice(firstRowIndex, lastRowIndex));
-    }, [rows, page, perPage]);
+
+        if (sortedColumn) {
+            const sortedRows = [...rows].sort((a, b) => {
+                const aValue = a[sortedColumn];
+                const bValue = b[sortedColumn];
+                if (sortOrder === 'asc') {
+                    return aValue > bValue ? 1 : -1;
+                } else {
+                    return aValue < bValue ? 1 : -1;
+                }
+            });
+            setCurrentRows(sortedRows.slice(firstRowIndex, lastRowIndex));
+        } else {
+            setCurrentRows(rows.slice(firstRowIndex, lastRowIndex));
+        }
+    }, [rows, page, perPage, sortedColumn, sortOrder, firstRowIndex, lastRowIndex]);
+
+    const handleSort = (column) => {
+        if (column === 'message') return;
+
+        if (sortedColumn === column) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortedColumn(column);
+            setSortOrder('asc');
+        }
+    };
 
     return (
         <>
@@ -54,21 +83,31 @@ const LogsHistory = () => {
                 <table className='table-logs'>
                     <thead>
                     <tr>
-                        {columns.map((row) => {
-                            return <th className={row.key} key={row.key}>{row.label}</th>
+                        {columns.map((column) => {
+                            return <th 
+                                className={column.key} 
+                                key={column.key}
+                                onClick={() => handleSort(column.key)}
+                            >
+                                {column.label}
+                                {sortedColumn === column.key ? (
+                                    <span>{sortOrder === 'asc' ? ' ↑' : ' ↓'}</span>
+                                ) : (
+                                    column.key !== 'message' && (<span className='sort-default'>⇅</span>)
+                                )}
+                            </th>
                         })}
                     </tr>
                     </thead>
                     <tbody>
                     {currentRows.map((d, i) => (
-                        <tr key={i}>
-                            <td className='id'>{d.id}</td>
-                            <td className='operation_id'>{d.operation_id}</td>
-                            <td className='date'>{moment(d.date).format('YYYY-MM-DD HH:mm:ss')}</td>
-                            <td className='operation'>{d.operation}</td>
-                            <td className={`status ${d.status}`}><span>{d.status}</span></td>
-                            <td className='message'>{d.message}</td>
-                        </tr>
+                      <tr key={i}>
+                          <td className="date">{moment(d.date).format('YYYY-MM-DD HH:mm:ss')}</td>
+                          <td className="operation_id">{d.operation_id}</td>
+                          <td className="operation">{d.operation}</td>
+                          <td className={`status ${d.status?.toLowerCase().replace(/\s+/g, '-')}`}><span>{d.status}</span></td>
+                          <td className="message">{d.message}</td>
+                      </tr>
                     ))}
                     </tbody>
                 </table>

@@ -14,26 +14,27 @@ import Spacings from '@commercetools-uikit/spacings';
 import messages from './messages';
 import styles from './live-connection.module.css';
 import './live-connection.css';
-import axios from 'axios';
 import {useEffect, useState} from 'react';
 import {ContentNotification} from "@commercetools-uikit/notifications";
 import PulseLoader from "react-spinners/PulseLoader";
-import ValidationPaydockData from '../../validation-paydock-data';
 import CommerceToolsAPIAdapter from '../../commercetools-api-adaptor';
+import ValidationPaydockData from '../../validation-paydock-data';
 
 
 const LiveConnectionForm = () => {
+    const apiAdapter = new CommerceToolsAPIAdapter();
+
     const intl = useIntl();
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    const apiAdapter = new CommerceToolsAPIAdapter();
     const group = 'live';
     const [id, setId] = useState(null);
     const [version, setVersion] = useState(null);
     const [createdAt, setCreatedAt] = useState(null);
+
     const sandbox_mode_options = [
         {value: 'Yes', label: 'Yes'},
         {value: 'No', label: 'No'},
@@ -71,10 +72,20 @@ const LiveConnectionForm = () => {
         {value: 'In-built 3DS', label: 'In-built 3DS'},
     ];
 
+    const card_3ds_flow_options = [
+        {value: 'With vault', label: 'With vault'},
+        {value: 'With OTT', label: 'With OTT'},
+    ];
+
     const card_fraud_options = [
         {value: 'Disable', label: 'Disable'},
         {value: 'Standalone Fraud', label: 'Standalone Fraud'},
         {value: 'In-built Fraud', label: 'In-built Fraud'},
+    ];
+
+    const card_fraud_options_3ds_standalone = [
+        {value: 'Disable', label: 'Disable'},
+        {value: 'Standalone Fraud', label: 'Standalone Fraud'},
     ];
 
     const card_direct_charge_options = [
@@ -99,8 +110,8 @@ const LiveConnectionForm = () => {
     ];
 
     const bank_accounts_bank_account_save_options = [
-        {value: 'Yes', label: 'Yes'},
-        {value: 'No', label: 'No'},
+        {value: 'Enable', label: 'Enable'},
+        {value: 'Disable', label: 'Disable'},
     ];
 
     const bank_accounts_bank_method_save_options = [
@@ -210,6 +221,7 @@ const LiveConnectionForm = () => {
             credentials_public_key: '',
             credentials_secret_key: '',
             credentials_access_key: '',
+            credentials_widget_access_key: '',
             card_use_on_checkout: 'No',
             card_supported_card_schemes: '',
             card_gateway_id: '',
@@ -223,7 +235,7 @@ const LiveConnectionForm = () => {
             card_card_method_save: 'Vault token',
             bank_accounts_use_on_checkout: 'No',
             bank_accounts_gateway_id: '',
-            bank_accounts_bank_account_save: 'No',
+            bank_accounts_bank_account_save: 'Disable',
             bank_accounts_bank_method_save: 'Vault token',
             wallets_apple_pay_use_on_checkout: '',
             wallets_apple_pay_gateway_id: '',
@@ -264,7 +276,7 @@ const LiveConnectionForm = () => {
             setLoading(true);
 
             try {
-                await new ValidationPaydockData(values).validateLive();
+                await new ValidationPaydockData().validateConnections(values);
                 apiAdapter.setConfigs(group, {
                     id: id,
                     version: version,
@@ -292,6 +304,26 @@ const LiveConnectionForm = () => {
         enableReinitialize: true,
     });
 
+    const handleChange = (event) => {
+        const {name, value} = event.target;
+
+        if (name === 'card_3ds' && value === 'Standalone 3DS') {
+            formik.setFieldValue('card_3ds_flow', formik.initialValues.card_3ds_flow);
+            formik.setFieldValue('card_fraud',  formik.initialValues.card_fraud);
+        }
+
+        if (name === 'card_fraud' && value === 'Standalone Fraud') {
+            formik.setFieldValue('card_3ds_flow', formik.initialValues.card_3ds_flow);
+        }
+
+        if (name === 'card_3ds_flow' && value === 'With OTT') {
+            formik.setFieldValue('card_card_save', formik.initialValues.card_card_save);
+            formik.setFieldValue('card_card_method_save', formik.initialValues.card_card_method_save);
+        }
+
+        formik.handleChange(event);
+    };
+
     useEffect(() => {
         apiAdapter.getConfigs(group).then((response) => {
             setVersion(response.version ?? null);
@@ -303,7 +335,6 @@ const LiveConnectionForm = () => {
                 formik.setValues(merged);
             }
         }).catch((error) => {
-            console.error('error', error)
             if (error.status !== 404) {
                 setError({message: error.message});
             }
@@ -368,7 +399,7 @@ const LiveConnectionForm = () => {
                                 <PasswordField
                                     name="credentials_public_key"
                                     title={intl.formatMessage(messages.credentialsPublicKeyTitle)}
-                                    description={intl.formatMessage(messages.credentialsPublicKeyDesc)}
+                                    description={intl.formatMessage(messages.credentialsPublicKeyDes)}
                                     value={formik.values.credentials_public_key}
                                     touched={formik.touched.credentials_public_key}
                                     onChange={formik.handleChange}
@@ -382,7 +413,7 @@ const LiveConnectionForm = () => {
                                 <PasswordField
                                     name="credentials_secret_key"
                                     title={intl.formatMessage(messages.credentialsSecretKeyTitle)}
-                                    description={intl.formatMessage(messages.credentialsSecretKeyDesc)}
+                                    description={intl.formatMessage(messages.credentialsSecretKeyDes)}
                                     value={formik.values.credentials_secret_key}
                                     touched={formik.touched.credentials_secret_key}
                                     onChange={formik.handleChange}
@@ -395,14 +426,27 @@ const LiveConnectionForm = () => {
                             {formik.values.credentials_type === 'access_key' && (
                                 <PasswordField
                                     name="credentials_access_key"
-                                    title={intl.formatMessage(messages.credentialsAccessKeyTitle)}
-                                    description={intl.formatMessage(messages.credentialsAccessKeyDesc)}
+                                    title={intl.formatMessage(messages.credentialsAccessKeyTit)}
+                                    description={intl.formatMessage(messages.credentialsAccessKeyDes)}
                                     value={formik.values.credentials_access_key}
                                     touched={formik.touched.credentials_access_key}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     isRequired={false}
                                     errors={formik.errors.credentials_access_key}
+                                />
+                            )}
+                            {formik.values.credentials_type === 'access_key' && (
+                                <PasswordField
+                                    name="credentials_widget_access_key"
+                                    title={intl.formatMessage(messages.credentialsWidgetAccessKeyTitle)}
+                                    description={intl.formatMessage(messages.credentialsWidgetAccessKeyDes)}
+                                    value={formik.values.credentials_widget_access_key}
+                                    touched={formik.touched.credentials_widget_access_key}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    isRequired={false}
+                                    errors={formik.errors.credentials_widget_access_key}
                                 />
                             )}
                         </Spacings.Stack>
@@ -466,14 +510,14 @@ const LiveConnectionForm = () => {
                                 title={intl.formatMessage(messages.cardsSelect3DS)}
                                 isMulti={false}
                                 value={formik.values.card_3ds}
-                                onChange={formik.handleChange}
+                                onChange={handleChange}
                                 onBlur={formik.handleBlur}
                                 options={card_3ds_options}
                                 isSearchable={false}
                                 isClearable={false}
                             />
 
-                            {formik.values.card_3ds !== 'Disable' && (
+                            {formik.values.card_3ds === 'Standalone 3DS' && (
                                 <TextField
                                     name="card_3ds_service_id"
                                     title={intl.formatMessage(messages.cards3DSservice)}
@@ -486,13 +530,27 @@ const LiveConnectionForm = () => {
                                 />
                             )}
 
-                            {formik.values.card_3ds !== 'Disable' && (
+                            {formik.values.card_3ds === 'In-built 3DS' && formik.values.card_fraud !== 'Standalone Fraud' && (
+                                <SelectField
+                                    name="card_3ds_flow"
+                                    title={intl.formatMessage(messages.cards3DSflow)}
+                                    isMulti={false}
+                                    value={formik.values.card_3ds_flow}
+                                    onChange={handleChange}
+                                    onBlur={formik.handleBlur}
+                                    options={card_3ds_flow_options}
+                                    isSearchable={false}
+                                    isClearable={false}
+                                />
+                            )}
+
+                            {(formik.values.card_3ds === 'Standalone 3DS' || (formik.values.card_3ds === 'In-built 3DS' && formik.values.card_fraud === 'Standalone Fraud')) && (
                                 <TextField
                                     name="card_3ds_flow"
                                     title={intl.formatMessage(messages.cards3DSflow)}
                                     value={formik.values.card_3ds_flow}
                                     touched={formik.touched.card_3ds_flow}
-                                    onChange={formik.handleChange}
+                                    onChange={handleChange}
                                     onBlur={formik.handleBlur}
                                     isRequired={false}
                                     isReadOnly={true}
@@ -504,9 +562,9 @@ const LiveConnectionForm = () => {
                                 title={intl.formatMessage(messages.cardsSelectFraud)}
                                 isMulti={false}
                                 value={formik.values.card_fraud}
-                                onChange={formik.handleChange}
+                                onChange={handleChange}
                                 onBlur={formik.handleBlur}
-                                options={card_fraud_options}
+                                options={formik.values.card_3ds === 'Standalone 3DS' ? card_fraud_options_3ds_standalone : card_fraud_options}
                                 isSearchable={false}
                                 isClearable={false}
                             />
@@ -537,20 +595,22 @@ const LiveConnectionForm = () => {
                                 isClearable={false}
                             />
 
-                            <SelectField
-                                name="card_card_save"
-                                title={intl.formatMessage(messages.cardsSelectSaveCardTitle)}
-                                description={intl.formatMessage(messages.cardsSelectSaveCardDescription)}
-                                isMulti={false}
-                                value={formik.values.card_card_save}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                options={card_card_save_options}
-                                isSearchable={false}
-                                isClearable={false}
-                            />
+                            {formik.values.card_3ds_flow !== 'With OTT' && (
+                                <SelectField
+                                    name="card_card_save"
+                                    title={intl.formatMessage(messages.cardsSelectSaveCardTitle)}
+                                    description={intl.formatMessage(messages.cardsSelectSaveCardDescription)}
+                                    isMulti={false}
+                                    value={formik.values.card_card_save}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    options={card_card_save_options}
+                                    isSearchable={false}
+                                    isClearable={false}
+                                />
+                            )}
 
-                            {formik.values.card_card_save !== 'Disable' && (
+                            {formik.values.card_card_save !== 'Disable' && formik.values.card_3ds_flow !== 'With OTT' &&(
                                 <SelectField
                                     name="card_card_method_save"
                                     title={intl.formatMessage(messages.cardsSelectSaveCardMethod)}
@@ -610,7 +670,7 @@ const LiveConnectionForm = () => {
                                 isClearable={false}
                             />
 
-                            {formik.values.bank_accounts_bank_account_save !== 'No' && (
+                            {formik.values.bank_accounts_bank_account_save !== 'Disable' && (
                                 <SelectField
                                     name="bank_accounts_bank_method_save"
                                     title={intl.formatMessage(messages.banksAccountSaveMethodTitle)}
@@ -1006,7 +1066,7 @@ const LiveConnectionForm = () => {
                                 </Constraints.Horizontal>
                             </CollapsiblePanel>
 
-                            <CollapsiblePanel header="Zippay" isDefaultClosed={true} className="collapsible-panel">
+                            <CollapsiblePanel header="Zip" isDefaultClosed={true} className="collapsible-panel">
                                 <Constraints.Horizontal max={'scale'}>
                                     <Spacings.Stack scale="xl">
 

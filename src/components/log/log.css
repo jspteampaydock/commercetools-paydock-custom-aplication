@@ -60,6 +60,50 @@
 .table-logs .Rejected span {
     background-color: rgba(241, 161, 161, 0.58);
 }
+.table-logs th.status,
+.table-logs th.operation,
+.table-logs th.date,
+.table-logs th.operation_id,
+.table-logs th.id {
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.table-logs th span.sort-default {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    margin-left: 5px;
+}
+
+.table-logs th:hover span.sort-default {
+    transform: rotate(180deg);
+}
+
+.table-logs .authorized-via-paydock span,
+.table-logs .partial-refunded-via-paydock span,
+.table-logs .fraud-service-not-found span,
+.table-logs .pending span,
+.table-logs .pending-via-paydock span,
+.table-logs .authorized span,
+.table-logs .requested-via-paydock span {
+    background-color: #FDEEE3;
+    color: #B55015;
+}
+.table-logs .received span,
+.table-logs .refund-via-paydock span,
+.table-logs .canceled-via-paydock span,
+.table-logs .canceled-authorize-via-paydock span,
+.table-logs .paid-via-paydock span {
+    background-color: #CEF6F3;
+    color: #1D635D;
+}
+
+.table-logs .fail span,
+.table-logs .fail-via-paydock span,
+.table-logs .cancel span {
+    background-color: rgba(241, 161, 161, 0.58);
+}
+
 
 @media (min-width: 1160px) {
     .table-logs .status {

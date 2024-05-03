@@ -9,6 +9,10 @@
     background-color: rgb(249, 249, 251);
 }
 
+.billing_information, .shipping_information{
+    min-width: 240px;
+}
+
 .table-orders thead:hover th:not(:last-child):before {
     content: '';
     position: absolute;
@@ -70,43 +74,27 @@
     color: #fa0000;
 }
 
-.table-orders .cancel-via-paydock span {
-    background-color: rgba(2241, 233, 161, 0.58);
-}
-
-.table-orders .paid span {
-    background-color: rgba(161, 241, 165, 0.58);
-}
-
-.table-orders .authorized-via-paydock span,
-.table-orders .partial-refunded-via-paydock span,
-.table-orders .fraud-service-not-found span,
-.table-orders .pending span,
-.table-orders .pending-via-paydock span,
-.table-orders .authorized span,
-.table-orders .requested-via-paydock span {
+.table-orders .paydock-authorize span,
+.table-orders .paydock-p-refund span,
+.table-orders .paydock-pending span,
+.table-orders .paydock-requested span {
     background-color: #FDEEE3;
     color: #B55015;
+}
+.table-orders .paydock-recived span,
+.table-orders .paydock-refunded span,
+.table-orders .paydock-cancelled span,
+.table-orders .paydock-paid span {
+    background-color: #CEF6F3;
+    color: #1D635D;
+}
+.table-orders .paydock-failed span {
+    background-color: rgba(241, 161, 161, 0.58);
 }
 .refund-base-amount{
     text-decoration:line-through;
     padding-right: 5px;
 }
-.table-orders .received span,
-.table-orders .refund-via-paydock span,
-.table-orders .canceled-via-paydock span,
-.table-orders .canceled-authorize-via-paydock span,
-.table-orders .paid-via-paydock span {
-    background-color: #CEF6F3;
-    color: #1D635D;
-}
-
-.table-orders .fail span,
-.table-orders .fail-via-paydock span,
-.table-orders .cancel span {
-    background-color: rgba(241, 161, 161, 0.58);
-}
-
 .table-orders .action button:not(:last-child) {
     margin-right: 15px;
 }
@@ -161,18 +149,38 @@
     margin: 0;
     width: 100%;
 }
+.table-orders th.id,
+.table-orders th.paydock_transaction,
+.table-orders th.billing_information,
+.table-orders th.shipping_information,
+.table-orders th.name,
+.table-orders th.amount,
+.table-orders th.currency,
+.table-orders th.payment_source_type,
+.table-orders th.created_at,
+.table-orders th.updated_at,
+.table-orders th.status {
+    cursor: pointer;
+}
+
+.table-orders th span.sort-default {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    margin-left: 5px;
+}
+
+.table-orders th:hover span.sort-default {
+    transform: rotate(180deg);
+}
 
 @media (min-width: 1500px) {
-    .table-orders .status {
-        text-align: center;
-    }
-
     .table-orders .date {
         width: 15%;
     }
 
     .table-orders .status {
         width: 20%;
+        text-align: center;
     }
     .table-orders .payment-source {
         width: 10%;

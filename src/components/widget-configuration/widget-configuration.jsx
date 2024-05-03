@@ -20,7 +20,6 @@ import ColorPicker from './color-picker';
 import PulseLoader from "react-spinners/PulseLoader";
 import CommerceToolsAPIAdapter from '../../commercetools-api-adaptor';
 
-
 const WidgetConfigurationForm = () => {
     const intl = useIntl();
     const [error, setError] = useState(null);
@@ -77,10 +76,18 @@ const WidgetConfigurationForm = () => {
         payment_methods_cards_description: '',
         payment_methods_bank_accounts_title: '',
         payment_methods_bank_accounts_description: '',
-        payment_methods_wallets_title: '',
-        payment_methods_wallets_description: '',
-        payment_methods_alternative_payment_method_title: '',
-        payment_methods_alternative_payment_method_description: '',
+        payment_methods_wallets_apple_pay_title: '',
+        payment_methods_wallets_apple_pay_description: '',
+        payment_methods_wallets_google_pay_title: '',
+        payment_methods_wallets_google_pay_description: '',
+        payment_methods_wallets_afterpay_v2_title: '',
+        payment_methods_wallets_afterpay_v2_description: '',
+        payment_methods_wallets_paypal_title: '',
+        payment_methods_wallets_paypal_description: '',
+        payment_methods_alternative_payment_method_afterpay_v1_title: '',
+        payment_methods_alternative_payment_method_afterpay_v1_description: '',
+        payment_methods_alternative_payment_method_zip_title: '',
+        payment_methods_alternative_payment_method_zip_description: '',
         widget_style_bg_color: '#D9D9D9',
         widget_style_text_color: '#000000',
         widget_style_border_color: '#000000',
@@ -88,56 +95,58 @@ const WidgetConfigurationForm = () => {
         widget_style_success_color: '#51B97C',
         widget_style_font_size: '14px',
         widget_style_font_family: 'ui-rounded',
-        widget_style_custom_element: `{
-          "input":{
-          "color": "rgb(0, 0, 0)",
-          "border": "dashed red;",
-          "border_radius": "30px",
-          "background_color": "rgba(255, 255, 255, 0.9)",
-          "height": "20px",
-          "text_decoration": "underline",
-          "font_size": "20px",
-          "font_family": "serif",
-          "transition": "margin-right 2s",
-          "line_height": "20",
-          "font_weight": "400",
-          "padding": "2",
-          "margin": "2"
-          },
-          "label":{
-          "color": "rgb(0, 0, 0)",
-          "text_decoration": "underline",
-          "font_size": "20px",
-          "font_family": "serif",
-          "line_height": "20",
-          "font_weight": "400",
-          "padding": "2",
-          "margin": "2"
-          },
-          "title":{
-          "color": "rgb(0, 0, 0)",
-          "text_decoration": "underline",
-          "font_size": "20px",
-          "font_family": "serif",
-          "line_height": "20",
-          "font_weight": "400",
-          "padding": "2",
-          "margin": "2",
-          "text-align": "center"
-          },
-          "title_description":{
-          "color": "rgb(0, 0, 0)",
-          "text_decoration": "underline",
-          "font_size": "20px",
-          "font_family": "serif",
-          "line_height": "20",
-          "font_weight": "400",
-          "padding": "2",
-          "margin": "2",
-          "text-align": "center"
-          }
-      }`,
+        widget_style_custom_element: '',
     });
+
+    const customElementStyles = {
+        "input": {
+            "color": "rgb(0, 0, 0)",
+            "border": "dashed red;",
+            "border_radius": "30px",
+            "background_color": "rgba(255, 255, 255, 0.9)",
+            "height": "20px",
+            "text_decoration": "underline",
+            "font_size": "20px",
+            "font_family": "serif",
+            "transition": "margin-right 2s",
+            "line_height": "20",
+            "font_weight": "400",
+            "padding": "2",
+            "margin": "2"
+        },
+        "label": {
+            "color": "rgb(0, 0, 0)",
+            "text_decoration": "underline",
+            "font_size": "20px",
+            "font_family": "serif",
+            "line_height": "20",
+            "font_weight": "400",
+            "padding": "2",
+            "margin": "2"
+        },
+        "title": {
+            "color": "rgb(0, 0, 0)",
+            "text_decoration": "underline",
+            "font_size": "20px",
+            "font_family": "serif",
+            "line_height": "20",
+            "font_weight": "400",
+            "padding": "2",
+            "margin": "2",
+            "text-align": "center"
+        },
+        "title_description": {
+            "color": "rgb(0, 0, 0)",
+            "text_decoration": "underline",
+            "font_size": "20px",
+            "font_family": "serif",
+            "line_height": "20",
+            "font_weight": "400",
+            "padding": "2",
+            "margin": "2",
+            "text-align": "center"
+        }
+    };
 
     const formik = useFormik({
         initialValues: initialValues,
@@ -215,10 +224,10 @@ const WidgetConfigurationForm = () => {
                         {loading ? <PulseLoader color={'#36d7b7'} loading={loading} size={10}/> : (
                             <>
                                 <SecondaryButton
-                                    onClick={(e) => {
-                                        formik.resetForm({values: ''});
+                                    onClick={() => {
                                         if (success) setSuccess(false);
                                         if (error) setError(false);
+                                        formik.handleReset
                                     }}
                                     isDisabled={formik.isSubmitting}
                                     label="Cancel"
@@ -229,7 +238,7 @@ const WidgetConfigurationForm = () => {
                                     onClick={formik.handleSubmit}
                                     isDisabled={formik.isSubmitting || !formik.dirty}
                                 />
-                            </>
+                           </>
                         )}
                     </div>
                 </div>
@@ -340,21 +349,84 @@ const WidgetConfigurationForm = () => {
                                     <Spacings.Stack scale="xl">
 
                                         <TextField
-                                            name="payment_methods_wallets_title"
-                                            title={intl.formatMessage(messages.paymentMethodsTitle)}
-                                            value={formik.values.payment_methods_wallets_title}
-                                            errors={TextField.toFieldErrors(formik.errors).payment_methods_wallets_title}
-                                            touched={formik.touched.payment_methods_wallets_title}
+                                            name="payment_methods_wallets_apple_pay_title"
+                                            title={intl.formatMessage(messages.paymentMethodsApplePayTitle)}
+                                            value={formik.values.payment_methods_wallets_apple_pay_title}
+                                            errors={TextField.toFieldErrors(formik.errors).payment_methods_wallets_apple_pay_title}
+                                            touched={formik.touched.payment_methods_wallets_apple_pay_title}
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             isRequired={true}
                                         />
 
                                         <TextField
-                                            name="payment_methods_wallets_description"
-                                            title={intl.formatMessage(messages.paymentMethodsDescription)}
-                                            value={formik.values.payment_methods_wallets_description}
-                                            touched={formik.touched.payment_methods_wallets_description}
+                                            name="payment_methods_wallets_apple_pay_description"
+                                            title={intl.formatMessage(messages.paymentMethodsApplePayDescription)}
+                                            value={formik.values.payment_methods_wallets_apple_pay_description}
+                                            touched={formik.touched.payment_methods_wallets_apple_pay_description}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            isRequired={false}
+                                        />
+
+                                        <TextField
+                                            name="payment_methods_wallets_google_pay_title"
+                                            title={intl.formatMessage(messages.paymentMethodsGooglePayTitle)}
+                                            value={formik.values.payment_methods_wallets_google_pay_title}
+                                            errors={TextField.toFieldErrors(formik.errors).payment_methods_wallets_google_pay_title}
+                                            touched={formik.touched.payment_methods_wallets_google_pay_title}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            isRequired={true}
+                                        />
+
+                                        <TextField
+                                            name="payment_methods_wallets_google_pay_description"
+                                            title={intl.formatMessage(messages.paymentMethodsGooglePayDescription)}
+                                            value={formik.values.payment_methods_wallets_google_pay_description}
+                                            touched={formik.touched.payment_methods_wallets_google_pay_description}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            isRequired={false}
+                                        />
+
+                                        <TextField
+                                            name="payment_methods_wallets_afterpay_v2_title"
+                                            title={intl.formatMessage(messages.paymentMethodsAfterpayV2Title)}
+                                            value={formik.values.payment_methods_wallets_afterpay_v2_title}
+                                            errors={TextField.toFieldErrors(formik.errors).payment_methods_wallets_afterpay_v2_title}
+                                            touched={formik.touched.payment_methods_wallets_afterpay_v2_title}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            isRequired={true}
+                                        />
+
+                                        <TextField
+                                            name="payment_methods_wallets_afterpay_v2_description"
+                                            title={intl.formatMessage(messages.paymentMethodsAfterpayV2Description)}
+                                            value={formik.values.payment_methods_wallets_afterpay_v2_description}
+                                            touched={formik.touched.payment_methods_wallets_afterpay_v2_description}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            isRequired={false}
+                                        />
+
+                                        <TextField
+                                            name="payment_methods_wallets_paypal_title"
+                                            title={intl.formatMessage(messages.paymentMethodsPaypalTitle)}
+                                            value={formik.values.payment_methods_wallets_paypal_title}
+                                            errors={TextField.toFieldErrors(formik.errors).payment_methods_wallets_paypal_title}
+                                            touched={formik.touched.payment_methods_wallets_paypal_title}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            isRequired={true}
+                                        />
+
+                                        <TextField
+                                            name="payment_methods_wallets_paypal_description"
+                                            title={intl.formatMessage(messages.paymentMethodsPaypalDescription)}
+                                            value={formik.values.payment_methods_wallets_paypal_description}
+                                            touched={formik.touched.payment_methods_wallets_paypal_description}
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             isRequired={false}
@@ -370,21 +442,42 @@ const WidgetConfigurationForm = () => {
                                     <Spacings.Stack scale="xl">
 
                                         <TextField
-                                            name="payment_methods_alternative_payment_method_title"
-                                            title={intl.formatMessage(messages.paymentMethodsTitle)}
-                                            value={formik.values.payment_methods_alternative_payment_method_title}
-                                            errors={TextField.toFieldErrors(formik.errors).payment_methods_alternative_payment_method_title}
-                                            touched={formik.touched.payment_methods_alternative_payment_method_title}
+                                            name="payment_methods_alternative_payment_method_afterpay_v1_title"
+                                            title={intl.formatMessage(messages.paymentMethodsAfterpayV1Title)}
+                                            value={formik.values.payment_methods_alternative_payment_method_afterpay_v1_title}
+                                            errors={TextField.toFieldErrors(formik.errors).payment_methods_alternative_payment_method_afterpay_v1_title}
+                                            touched={formik.touched.payment_methods_alternative_payment_method_afterpay_v1_title}
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             isRequired={true}
                                         />
 
                                         <TextField
-                                            name="payment_methods_alternative_payment_method_description"
-                                            title={intl.formatMessage(messages.paymentMethodsDescription)}
-                                            value={formik.values.payment_methods_alternative_payment_method_description}
-                                            touched={formik.touched.payment_methods_alternative_payment_method_description}
+                                            name="payment_methods_alternative_payment_method_afterpay_v1_description"
+                                            title={intl.formatMessage(messages.paymentMethodsAfterpayV1Description)}
+                                            value={formik.values.payment_methods_alternative_payment_method_afterpay_v1_description}
+                                            touched={formik.touched.payment_methods_alternative_payment_method_afterpay_v1_description}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            isRequired={false}
+                                        />
+
+                                        <TextField
+                                            name="payment_methods_alternative_payment_method_zip_title"
+                                            title={intl.formatMessage(messages.paymentMethodsZipTitle)}
+                                            value={formik.values.payment_methods_alternative_payment_method_zip_title}
+                                            errors={TextField.toFieldErrors(formik.errors).payment_methods_alternative_payment_method_zip_title}
+                                            touched={formik.touched.payment_methods_alternative_payment_method_zip_title}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            isRequired={true}
+                                        />
+
+                                        <TextField
+                                            name="payment_methods_alternative_payment_method_zip_description"
+                                            title={intl.formatMessage(messages.paymentMethodsZipDescription)}
+                                            value={formik.values.payment_methods_alternative_payment_method_zip_description}
+                                            touched={formik.touched.payment_methods_alternative_payment_method_zip_description}
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             isRequired={false}
@@ -463,6 +556,7 @@ const WidgetConfigurationForm = () => {
                                 isDisabled={formik.isSubmitting}
                                 isRequired={false}
                                 defaultExpandMultilineText={false}
+                                placeholder={JSON.stringify(customElementStyles, null, 2)}
                             />
 
                         </Spacings.Stack>

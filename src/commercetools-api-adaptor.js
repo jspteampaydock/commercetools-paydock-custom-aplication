@@ -6,6 +6,17 @@ class CommerceToolsAPIAdapter {
         this.region = 'europe-west1';
         this.accessToken = null;
         this.tokenExpirationTime = null;
+        this.arrayPaydockStatus = {
+            'paydock-pending': 'Pending via Paydock',
+            'paydock-paid': 'Paid via Paydock',
+            'paydock-authorize': 'Authorized via Paydock',
+            'paydock-cancelled': 'Cancelled via Paydock',
+            'paydock-refunded': 'Refunded via Paydock',
+            'paydock-p-refund': 'Partial refunded via Paydock',
+            'paydock-requested': 'Requested via Paydock',
+            'paydock-failed': 'Failed via Paydock',
+            'paydock-recived': 'Recived via Paydock',
+        };
     }
 
     async setAccessToken(accessToken, tokenExpirationInSeconds) {
@@ -97,84 +108,176 @@ class CommerceToolsAPIAdapter {
     async getLogs() {
         let logs = [];
         let paydockLogs = await this.makeRequest('/custom-objects/paydock-logs?&sort=key+desc');
-        let i = 1;
         if (paydockLogs.results) {
             paydockLogs.results.forEach((paydockLog) => {
                 let log = {
-                    id: i,
                     operation_id: paydockLog.value.paydockChargeID,
                     date: paydockLog.createdAt,
-                    operation: paydockLog.value.operation,
+                    operation: this.getStatusByKey(paydockLog.value.operation),
                     status: paydockLog.value.status,
                     message: paydockLog.value.message,
                 };
-                i++;
                 logs.push(log);
             });
         }
         return logs;
     }
 
+    getStatusByKey(statusKey) {
+        if (this.arrayPaydockStatus[statusKey] !== undefined) {
+            return this.arrayPaydockStatus[statusKey];
+        }
+        return null;
+    }
+
+
+    async collectArrayPayments(payments, paymentsArray) {
+        if (!payments.results) return;
+
+        payments.results.forEach((payment) => {
+            if (payment.custom.fields.AdditionalInformation === undefined) {
+                return;
+            }
+            let customFields = payment.custom.fields;
+            let additionalFields = customFields.AdditionalInformation;
+            if (typeof additionalFields !== 'object') {
+                additionalFields = JSON.parse(additionalFields);
+            }
+            let billingInformation = additionalFields.BillingInformation ?? '-';
+            let shippingInformation = additionalFields.ShippingInformation ?? '-';
+            if (shippingInformation != '-') {
+                if (typeof shippingInformation !== 'object') {
+                    shippingInformation = JSON.parse(shippingInformation);
+                }
+                shippingInformation = this.convertInfoToString(shippingInformation);
+            }
+            if (billingInformation !== '-') {
+                if (typeof billingInformation !== 'object') {
+                    billingInformation = JSON.parse(billingInformation);
+                }
+                billingInformation = this.convertInfoToString(billingInformation);
+            }
+            shippingInformation = billingInformation == shippingInformation ? '-' : shippingInformation;
+            paymentsArray[payment.id] = {
+                id: payment.id,
+                amount: payment.amountPlanned.centAmount,
+                currency: payment.amountPlanned.currencyCode,
+                createdAt: payment.createdAt,
+                lastModifiedAt: payment.lastModifiedAt,
+                paymentSourceType: customFields.PaydockPaymentType,
+                paydockPaymentStatus: customFields.PaydockPaymentStatus,
+                paydockChargeId: customFields.PaydockTransactionId,
+                shippingInfo: shippingInformation,
+                billingInfo: billingInformation,
+                refundAmount : customFields.RefundedAmount ?? 0
+            };
+        });
+    }
+
+    convertInfoToString(info) {
+        let name = info['name'] ?? '-';
+        let address = info['address'] ?? '-';
+        return 'Name: ' + name + ' \n' + 'Address: ' + address;
+    }
+
     async getOrders() {
         try {
             const paydockOrders = [];
             const paymentsArray = [];
-            let queryString = encodeURIComponent('paymentMethodInfo(method="paydock-pay")');
-            const payments = await this.makeRequest('/payments?where=' + queryString);
-            if (payments.results) {
-                payments.results.forEach((payment) => {
-                    if(payment.custom.fields.AdditionalInformation === undefined){
-                        return;
-                    }
-                    let customFields = payment.custom.fields;
-                    let additionalFields = JSON.parse(customFields.AdditionalInformation);
-                    paymentsArray[payment.id] = {
-                        id: payment.id,
-                        amount: payment.amountPlanned.centAmount / 100,
-                        currency: payment.amountPlanned.currencyCode,
-                        createdAt: payment.createdAt,
-                        lastModifiedAt: payment.lastModifiedAt,
-                        paymentSourceType: customFields.PaydockPaymentType,
-                        paydockPaymentStatus: customFields.PaydockPaymentStatus,
-                        paydockChargeId: additionalFields.charge_id,
-                    };
-                });
-            }
-
+            const payments = await this.makeRequest('/payments?where=' + encodeURIComponent('paymentMethodInfo(method="paydock-pay") and custom(fields(AdditionalInformation is not empty))') + '&sort=createdAt+desc&limit=500');
+            await this.collectArrayPayments(payments, paymentsArray);
             let orderQuery = '"' + Object.keys(paymentsArray).join('","') + '"';
-
-            queryString = encodeURIComponent('paymentInfo(payments(id in(' + orderQuery + ')))');
-            const orders = await this.makeRequest('/orders?where=' + queryString+'&sort=createdAt+desc');
-            orders.results.forEach((order) => {
-                let objOrder = {
-                    orderId: order.id,
-                    name: order.billingAddress.firstName + ' ' + order.billingAddress.lastName,
-                    orderUrl: `https://mc.${this.region}.gcp.commercetools.com/${this.projectKey}/orders/${order.id}/payments`,
-                };
-                if (order.paymentInfo.payments) {
-                    order.paymentInfo.payments.forEach((payment) => {
-                        if (paymentsArray[payment.id] !== undefined) {
-                            let currentPayment = paymentsArray[payment.id];
-                            objOrder.amount = currentPayment.amount;
-                            objOrder.currency = currentPayment.currency;
-                            objOrder.createdAt = currentPayment.createdAt;
-                            objOrder.lastModifiedAt = currentPayment.lastModifiedAt;
-                            objOrder.paymentSourceType = currentPayment.paymentSourceType;
-                            objOrder.status = currentPayment.paydockPaymentStatus;
-                            objOrder.paydockChargeId = currentPayment.paydockChargeId;
-                        }
-                    });
-                }
-                paydockOrders.push(objOrder);
-            });
+            const orders = await this.makeRequest('/orders?where=' + encodeURIComponent('paymentInfo(payments(id in(' + orderQuery + ')))') + '&sort=createdAt+desc&limit=500');
+            await this.collectArrayOrders(orders, paymentsArray, paydockOrders);
             return paydockOrders;
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error fetching ordres:', error);
             throw error;
         }
     }
 
-    // Add more methods for other API endpoints as needed
+    async updateOrderStatus(data) {
+
+        const orderId = data.orderId;
+        let response= {};
+        let error= null;
+
+        const payment = await this.makeRequest('/payments/'+orderId);
+        if(payment){
+            const requestData = {
+                version: payment.version,
+                actions: [
+                      {
+                          action: "setCustomField",
+                          name: "PaymentExtensionRequest",
+                          value: JSON.stringify({
+                              action : "updatePaymentStatus",
+                              request: data
+                          })
+                      }
+                  ]
+            };
+            try {
+                let updateStatusResponse = await this.makeRequest('/payments/'+orderId,'POST', requestData);
+                console.log(updateStatusResponse);
+                let paymentExtensionResponse = updateStatusResponse.custom?.fields?.PaymentExtensionResponse
+                if(!paymentExtensionResponse){
+                    error = 'Error update status of payment'
+                }
+                paymentExtensionResponse = JSON.parse(paymentExtensionResponse);
+                if(!paymentExtensionResponse.status){
+                    error = paymentExtensionResponse.message;
+                }
+            } catch (error) {
+                return {success: false, message: 'Error update status of payment'};
+            }
+        }else{
+            error = 'Error fetching payment';
+        }
+
+        if(error){
+            response = {success: false, message: error}
+        }else{
+            response = {success: true}
+        }
+
+        return response;
+    }
+
+    async collectArrayOrders(orders, paymentsArray, paydockOrders) {
+        for (const order of orders.results) {
+            let objOrder = {
+                id: order.id,
+                order_number: order.orderNumber,
+                order_url: `https://mc.${this.region}.gcp.commercetools.com/${this.projectKey}/orders/${order.id}/payments`,
+            };
+
+            if (order.paymentInfo.payments) {
+                await this.collectArrayOrdersPayments(order.paymentInfo.payments, paymentsArray, objOrder);
+            }
+            paydockOrders.push(objOrder);
+        }
+    }
+
+    async collectArrayOrdersPayments(orderPayments, paymentsArray, objOrder) {
+        for (const payment of orderPayments) {
+            if (paymentsArray[payment.id] !== undefined) {
+                let currentPayment = paymentsArray[payment.id];
+                objOrder.amount = currentPayment.amount;
+                objOrder.currency = currentPayment.currency;
+                objOrder.created_at = currentPayment.createdAt;
+                objOrder.updated_at = currentPayment.lastModifiedAt;
+                objOrder.payment_source_type = currentPayment.paymentSourceType;
+                objOrder.status = currentPayment.paydockPaymentStatus;
+                objOrder.statusName = this.getStatusByKey(currentPayment.paydockPaymentStatus);
+                objOrder.paydock_transaction = currentPayment.paydockChargeId;
+                objOrder.shipping_information = currentPayment.shippingInfo;
+                objOrder.billing_information = currentPayment.billingInfo;
+                objOrder.refund_amount = currentPayment.refundAmount;
+            }
+        }
+    }
+
 }
 
 export default CommerceToolsAPIAdapter;

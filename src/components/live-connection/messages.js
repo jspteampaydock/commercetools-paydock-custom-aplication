@@ -20,29 +20,37 @@ export default defineMessages({
     id: 'LiveConnection.credentialsPublicKeyTitle',
     defaultMessage: 'Public Key',
   },
-  credentialsPublicKeyDesc: {
-    id: 'LiveConnection.credentialsPublicKeyDesc',
-    defaultMessage: 'Public Key from Paydock/PowerBoard',
+  credentialsPublicKeyDes: {
+    id: 'LiveConnection.credentialsPublicKeyDes',
+    defaultMessage: 'Enter the API public key for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
   },
 
   credentialsSecretKeyTitle: {
     id: 'LiveConnection.credentialsSecretKeyTitle',
     defaultMessage: 'Secret Key',
   },
-  credentialsSecretKeyDesc: {
-    id: 'LiveConnection.credentialsSecretKeyDesc',
-    defaultMessage: 'Secret Key from Paydock/PowerBoard',
+  credentialsSecretKeyDes: {
+    id: 'LiveConnection.credentialsSecretKeyDes',
+    defaultMessage: 'Enter the API secret key for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
   },
 
-  credentialsAccessKeyTitle: {
-    id: 'LiveConnection.credentialsAccessKeyTitle',
-    defaultMessage: 'Access Token',
+  credentialsAccessKeyTit: {
+    id: 'LiveConnection.credentialsAccessKeyTit',
+    defaultMessage: 'API Access Token',
   },
-  credentialsAccessKeyDesc: {
-    id: 'LiveConnection.credentialsAccessKeyDesc',
-    defaultMessage: 'Access Token from Paydock/PowerBoard',
+  credentialsAccessKeyDes: {
+    id: 'LiveConnection.credentialsAccessKeyDes',
+    defaultMessage: 'Enter the API access token for authentication. This token is used to authorize transactions. It needs to be filled in only if API Public Key & API Secret Key is not entered.',
   },
 
+  credentialsWidgetAccessKeyTitle: {
+    id: 'LiveConnection.credentialsWidgetAccessKeyTitle',
+    defaultMessage: 'Widget Access Token',
+  },
+  credentialsWidgetAccessKeyDes: {
+    id: 'LiveConnection.credentialsWidgetAccessKeyDes',
+    defaultMessage: 'Enter the widget access token for authentication. This token is used to authorize widget transactions. It needs to be filled in only if API Public Key & API Secret Key is not entered.',
+  },
   selectSandboxModeTitle: {
     id: 'LiveConnection.selectSandboxModeTitle',
     defaultMessage: 'Sandbox mode',

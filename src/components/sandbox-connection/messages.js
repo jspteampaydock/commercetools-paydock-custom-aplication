@@ -20,27 +20,35 @@ export default defineMessages({
     id: 'SandboxConnection.credentialsPublicKeyTitle',
     defaultMessage: 'Public Key',
   },
-  credentialsPublicKeyDesc: {
-    id: 'SandboxConnection.credentialsPublicKeyDesc',
-    defaultMessage: 'Public Key from Paydock/PowerBoard',
+  credentialsPublicKeyDes: {
+    id: 'SandboxConnection.credentialsPublicKeyDes',
+    defaultMessage: 'Enter the API public key for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
   },
 
   credentialsSecretKeyTitle: {
     id: 'SandboxConnection.credentialsSecretKeyTitle',
     defaultMessage: 'Secret Key',
   },
-  credentialsSecretKeyDesc: {
-    id: 'SandboxConnection.credentialsSecretKeyDesc',
-    defaultMessage: 'Secret Key from Paydock/PowerBoard',
+  credentialsSecretKeyDes: {
+    id: 'SandboxConnection.credentialsSecretKeyDes',
+    defaultMessage: 'Enter the API secret key for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
+  },
+  credentialsAccessKeyTit: {
+    id: 'SandboxConnection.credentialsAccessKeyTit',
+    defaultMessage: 'API Access Token',
+  },
+  credentialsAccessKeyDes: {
+    id: 'SandboxConnection.credentialsAccessKeyDes',
+    defaultMessage: 'Enter the API access token for authentication. This token is used to authorize transactions. It needs to be filled in only if API Public Key API Secret Key is not entered.',
   },
 
-  credentialsAccessKeyTitle: {
-    id: 'SandboxConnection.credentialsAccessKeyTitle',
-    defaultMessage: 'Access Token',
+  credentialsWidgetAccessKeyTitle: {
+    id: 'SandboxConnection.credentialsWidgetAccessKeyTitle',
+    defaultMessage: 'Widget Access Token',
   },
-  credentialsAccessKeyDesc: {
-    id: 'SandboxConnection.credentialsAccessKeyDesc',
-    defaultMessage: 'Access Token from Paydock/PowerBoard',
+  credentialsWidgetAccessKeyDesc: {
+    id: 'SandboxConnection.credentialsWidgetAccessKeyDesc',
+    defaultMessage: 'Enter the widget access token for authentication. This token is used to authorize widget transactions. It needs to be filled in only if API Public Key & API Secret Key is not entered.',
   },
 
   selectSandboxModeTitle: {

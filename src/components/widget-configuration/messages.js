@@ -41,6 +41,66 @@ export default defineMessages({
     defaultMessage: 'Description',
   },
 
+  paymentMethodsApplePayTitle: {
+    id: 'WidgetConfiguration.paymentMethodsApplePayTitle',
+    defaultMessage: 'Apple Pay Title',
+  },
+
+  paymentMethodsApplePayDescription: {
+    id: 'WidgetConfiguration.paymentMethodsApplePayDescription',
+    defaultMessage: 'Apple Pay Description',
+  },
+
+  paymentMethodsGooglePayTitle: {
+    id: 'WidgetConfiguration.paymentMethodsGooglePayTitle',
+    defaultMessage: 'Google Pay Title',
+  },
+
+  paymentMethodsGooglePayDescription: {
+    id: 'WidgetConfiguration.paymentMethodsGooglePayDescription',
+    defaultMessage: 'Google Pay Description',
+  },
+
+  paymentMethodsAfterpayV2Title: {
+    id: 'WidgetConfiguration.paymentMethodsAfterpayV2Title',
+    defaultMessage: 'Afterpay V2 Title',
+  },
+
+  paymentMethodsAfterpayV2Description: {
+    id: 'WidgetConfiguration.paymentMethodsAfterpayV2Description',
+    defaultMessage: 'Afterpay V2 Description',
+  },
+
+  paymentMethodsPaypalTitle: {
+    id: 'WidgetConfiguration.paymentMethodsPaypalTitle',
+    defaultMessage: 'Paypal Title',
+  },
+
+  paymentMethodsPaypalDescription: {
+    id: 'WidgetConfiguration.paymentMethodsPaypalDescription',
+    defaultMessage: 'Paypal Description',
+  },
+
+  paymentMethodsAfterpayV1Title: {
+    id: 'WidgetConfiguration.paymentMethodsAfterpayV1Title',
+    defaultMessage: 'Afterpay V1 Title',
+  },
+
+  paymentMethodsAfterpayV1Description: {
+    id: 'WidgetConfiguration.paymentMethodsAfterpayV1Description',
+    defaultMessage: 'Afterpay V1 Description',
+  },
+
+  paymentMethodsZipTitle: {
+    id: 'WidgetConfiguration.paymentMethodsZipTitle',
+    defaultMessage: 'Zip Title',
+  },
+
+  paymentMethodsZipDescription: {
+    id: 'WidgetConfiguration.paymentMethodsZipDescription',
+    defaultMessage: 'Zip Description',
+  },
+
   widgetStyleFontSizeTitle: {
     id: 'WidgetConfiguration.widgetStyleFontSizeTitle',
     defaultMessage: 'Font size',
