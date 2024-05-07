@@ -29,6 +29,7 @@ const OrdersHistory = () => {
     const [statusUpdated, setStatusUpdated] = useState(false);
     const [orderId, setOrderId] = useState(null);
     const [status, setStatus] = useState(null);
+    const [statusName, setStatusName] = useState({});
     const [dateUpdated, setDateUpdated] = useState({});
     const [type, setType] = useState(null);
     const [refund, setRefund] = useState(null);
@@ -55,7 +56,7 @@ const OrdersHistory = () => {
         } else {
             setRowErrors(prevState => ({
                 ...prevState,
-                [id]: result.data,
+                [id]: result.error,
             }));
             setLoading(prevState => ({
                 ...prevState,
@@ -70,6 +71,10 @@ const OrdersHistory = () => {
             setChangeStatus(prevState => ({
                 ...prevState,
                 [orderId]: status,
+            }));
+            setStatusName(prevState => ({
+                ...prevState,
+                [orderId]: statusName,
             }));
             setChangeDate(prevState => ({
                 ...prevState,
@@ -121,7 +126,7 @@ const OrdersHistory = () => {
                 [orderId]: false,
             }));
         }
-    }, [statusUpdated, orderId, status, type, refund, dateUpdated]);
+    }, [statusUpdated, statusName, orderId, status, type, refund, dateUpdated]);
 
     const handleOrderAction = (type, id, amount = null, refund_amount = null) => {
         if (type == 'refund-btn') {
@@ -152,6 +157,7 @@ const OrdersHistory = () => {
         let newDates = moment().format('YYYY-MM-DD HH:mm:ss');
         if (type === 'capture' || type === 'cancel-authorize') {
             const newStatus = type === 'capture' ? 'paydock-paid' : 'paydock-cancelled';
+            const newStatusName = type === 'capture' ? 'Paid via Paydock' : 'Cancelled via Paydock';
 
             setLoading(prevState => ({
                 ...prevState,
@@ -159,7 +165,8 @@ const OrdersHistory = () => {
             }));
 
             setType(type);
-            setStatus(status);
+            setStatus(newStatus);
+            setStatusName(newStatusName)
             setOrderId(id);
             setDateUpdated(newDates);
 
@@ -168,6 +175,7 @@ const OrdersHistory = () => {
 
         if (type === 'cancel') {
             const newStatus = 'paydock-cancelled';
+            const newStatusName = 'Cancelled via Paydock'
 
             setLoading(prevState => ({
                 ...prevState,
@@ -175,7 +183,8 @@ const OrdersHistory = () => {
             }));
 
             setType(type);
-            setStatus(status);
+            setStatus(newStatus);
+            setStatusName(newStatusName)
             setOrderId(id);
             setDateUpdated(newDates);
 
@@ -213,9 +222,12 @@ const OrdersHistory = () => {
                 ? 'paydock-p-refund'
                 : undefined;
 
+            const newStatusName = newStatus === 'paydock-refunded' ? 'Refunded via Paydock' : 'Partial refunded via Paydock';
+
             setRefund(refundAmountUpdate);
             setType(type);
-            setStatus(status);
+            setStatus(newStatus);
+            setStatusName(newStatusName)
             setOrderId(id);
             setDateUpdated(newDates);
 
@@ -251,6 +263,7 @@ const OrdersHistory = () => {
     useEffect(async () => {
         // Виконання запиту до сервера
         let orders = await apiAdapter.getOrders();
+        console.log('orders', orders)
         setRows(orders);
         setCurrentRows(rows.slice(firstRowIndex, lastRowIndex));
     }, []);
@@ -382,7 +395,7 @@ const OrdersHistory = () => {
                         <td
                           className={`status ${changeStatus[d.order_number] ? changeStatus[d.order_number]: d.status}`}>
                             <span className="mobile-label">{columns[9].label}:</span>
-                            <span>{changeStatus[d.order_number] ? apiAdapter.getStatusByKey(changeStatus[d.order_number]) : d.statusName}</span>
+                            <span>{statusName[d.order_number] ? statusName[d.order_number] : d.statusName}</span>
                         </td>
                         <td className="action">
                             <div className="action-wrapper">

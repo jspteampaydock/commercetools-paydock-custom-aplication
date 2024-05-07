@@ -5,14 +5,14 @@ import { PERMISSIONS, entryPointUriPath } from './src/constants';
  */
 const config = {
   name: 'paydockapp',
-  entryPointUriPath: 'paydock_app',
+  entryPointUriPath: 'paydock-app',
   cloudIdentifier: 'gcp-eu',
   env: {
     development: {
-      initialProjectKey: 'dev-paydock',
+      initialProjectKey: 'paydockecomm',
     },
     production: {
-      applicationId: 'cluibzg2f0001ohu67w8r9z9w',
+      applicationId: 'clu8i7yq100513h7d0duarye1',
       url: 'https://jsp-test-six.vercel.app'
     },
   },

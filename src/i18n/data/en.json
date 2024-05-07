@@ -147,5 +147,6 @@
   "WidgetConfiguration.borderColor": "Border color",
   "WidgetConfiguration.errorColor": "Error color",
   "WidgetConfiguration.successColor": "Success color",
-  "Order.pageTitle": "Orders"
+  "Order.pageTitle": "Orders",
+  "Log.pageTitle": "Logs"
 }

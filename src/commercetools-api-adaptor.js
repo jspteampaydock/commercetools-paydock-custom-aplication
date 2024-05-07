@@ -1,8 +1,8 @@
 class CommerceToolsAPIAdapter {
     constructor() {
-        this.clientId = 'nFppX2eSm4c-JQX8yCAHb_Rd';
-        this.clientSecret = 'enCCCsalzqKKZtS4XB3YHo6v5jwfWlm3';
-        this.projectKey = 'dev-paydock';
+        this.clientId = 'kjQW8-nXHq4CfKVdFzEjUl6c';
+        this.clientSecret = 'Z1B_FP71UbE8xwcdAy_Q5FR7ztHSZZRJ';
+        this.projectKey = 'paydockecomm';
         this.region = 'europe-west1';
         this.accessToken = null;
         this.tokenExpirationTime = null;
@@ -15,7 +15,7 @@ class CommerceToolsAPIAdapter {
             'paydock-p-refund': 'Partial refunded via Paydock',
             'paydock-requested': 'Requested via Paydock',
             'paydock-failed': 'Failed via Paydock',
-            'paydock-recived': 'Recived via Paydock',
+            'paydock-received': 'Received via Paydock',
         };
     }
 
@@ -110,12 +110,13 @@ class CommerceToolsAPIAdapter {
         let paydockLogs = await this.makeRequest('/custom-objects/paydock-logs?&sort=key+desc');
         if (paydockLogs.results) {
             paydockLogs.results.forEach((paydockLog) => {
+                let message = typeof paydockLog.value.message === 'string' ? paydockLog.value.message : null;
                 let log = {
                     operation_id: paydockLog.value.paydockChargeID,
                     date: paydockLog.createdAt,
                     operation: this.getStatusByKey(paydockLog.value.operation),
                     status: paydockLog.value.status,
-                    message: paydockLog.value.message,
+                    message: message,
                 };
                 logs.push(log);
             });
@@ -127,7 +128,7 @@ class CommerceToolsAPIAdapter {
         if (this.arrayPaydockStatus[statusKey] !== undefined) {
             return this.arrayPaydockStatus[statusKey];
         }
-        return null;
+        return statusKey;
     }
 
 
@@ -158,9 +159,16 @@ class CommerceToolsAPIAdapter {
                 billingInformation = this.convertInfoToString(billingInformation);
             }
             shippingInformation = billingInformation == shippingInformation ? '-' : shippingInformation;
+
+
+            let amount = payment.amountPlanned.centAmount;
+            if (payment.amountPlanned.type === 'centPrecision') {
+                const fraction = 10 ** payment.amountPlanned.fractionDigits;
+                amount = amount / fraction;
+            }
             paymentsArray[payment.id] = {
                 id: payment.id,
-                amount: payment.amountPlanned.centAmount,
+                amount: amount,
                 currency: payment.amountPlanned.currencyCode,
                 createdAt: payment.createdAt,
                 lastModifiedAt: payment.lastModifiedAt,
@@ -169,7 +177,7 @@ class CommerceToolsAPIAdapter {
                 paydockChargeId: customFields.PaydockTransactionId,
                 shippingInfo: shippingInformation,
                 billingInfo: billingInformation,
-                refundAmount : customFields.RefundedAmount ?? 0
+                refundAmount: customFields.RefundedAmount ?? 0,
             };
         });
     }
@@ -199,46 +207,46 @@ class CommerceToolsAPIAdapter {
     async updateOrderStatus(data) {
 
         const orderId = data.orderId;
-        let response= {};
-        let error= null;
+        let response = {};
+        let error = null;
 
-        const payment = await this.makeRequest('/payments/'+orderId);
-        if(payment){
+        const payment = await this.makeRequest('/payments/' + orderId);
+        if (payment) {
             const requestData = {
                 version: payment.version,
                 actions: [
-                      {
-                          action: "setCustomField",
-                          name: "PaymentExtensionRequest",
-                          value: JSON.stringify({
-                              action : "updatePaymentStatus",
-                              request: data
-                          })
-                      }
-                  ]
+                    {
+                        action: 'setCustomField',
+                        name: 'PaymentExtensionRequest',
+                        value: JSON.stringify({
+                            action: 'updatePaymentStatus',
+                            request: data,
+                        }),
+                    },
+                ],
             };
             try {
-                let updateStatusResponse = await this.makeRequest('/payments/'+orderId,'POST', requestData);
+                let updateStatusResponse = await this.makeRequest('/payments/' + orderId, 'POST', requestData);
                 console.log(updateStatusResponse);
-                let paymentExtensionResponse = updateStatusResponse.custom?.fields?.PaymentExtensionResponse
-                if(!paymentExtensionResponse){
-                    error = 'Error update status of payment'
+                let paymentExtensionResponse = updateStatusResponse.custom?.fields?.PaymentExtensionResponse;
+                if (!paymentExtensionResponse) {
+                    error = 'Error update status of payment';
                 }
                 paymentExtensionResponse = JSON.parse(paymentExtensionResponse);
-                if(!paymentExtensionResponse.status){
+                if (!paymentExtensionResponse.status) {
                     error = paymentExtensionResponse.message;
                 }
             } catch (error) {
-                return {success: false, message: 'Error update status of payment'};
+                return { success: false, message: 'Error update status of payment' };
             }
-        }else{
+        } else {
             error = 'Error fetching payment';
         }
 
-        if(error){
-            response = {success: false, message: error}
-        }else{
-            response = {success: true}
+        if (error) {
+            response = { success: false, message: error };
+        } else {
+            response = { success: true };
         }
 
         return response;

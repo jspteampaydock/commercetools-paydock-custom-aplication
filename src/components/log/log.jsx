@@ -11,8 +11,6 @@ import CommerceToolsAPIAdapter from '../../commercetools-api-adaptor';
 
 const LogsHistory = () => {
     const [error, setError] = useState(null);
-    const urlApi = 'https://api.paydock-commercetool-app.jetsoftpro.dev/';
-    // const urlApi = 'http://localhost:3003/';
     const [rows, setRows] = useState([]);
     const [currentRows, setCurrentRows] = useState([]);
     const [sortedColumn, setSortedColumn] = useState(null);
@@ -35,6 +33,7 @@ const LogsHistory = () => {
     useEffect(async () => {
         const apiAdapter = new CommerceToolsAPIAdapter();
         let logs = await apiAdapter.getLogs();
+        console.log(logs);
         setRows(logs);
         setCurrentRows(rows.slice(firstRowIndex, lastRowIndex))
     }, []);
