@@ -19,6 +19,8 @@ import validate from './validate';
 import ColorPicker from './color-picker';
 import PulseLoader from "react-spinners/PulseLoader";
 import CommerceToolsAPIAdapter from '../../commercetools-api-adaptor';
+import { INITIAL_SANDBOX_CONNECTION_FORM, INITIAL_WIDGET_FORM } from '../../constants';
+
 
 const WidgetConfigurationForm = () => {
     const intl = useIntl();
@@ -185,12 +187,8 @@ const WidgetConfigurationForm = () => {
         enableReinitialize: true,
     });
 
-    useEffect(() => {
-        let result = {};
-        for (const property in messages) {
-            result[messages[property]['id']] = messages[property]['defaultMessage']
-        }
-        apiAdapter.getConfigs(group).then((response) => {
+    const getConfig = () => {
+        return apiAdapter.getConfigs(group).then((response) => {
             setVersion(response.version ?? null);
             setId(response.id ?? null);
             setCreatedAt(response.createdAt ?? null);
@@ -199,10 +197,26 @@ const WidgetConfigurationForm = () => {
                 let merged = { ...formik.values, ...response.value };
                 formik.setValues(merged);
             }
-        }).catch((error) => {
-            console.error('error', error)
-            if (error.status !== 404) {
-                setError({message: error.message});
+        });
+    }
+
+    useEffect(() => {
+        let result = {};
+        for (const property in messages) {
+            result[messages[property]['id']] = messages[property]['defaultMessage']
+        }
+        getConfig().catch((error) => {
+            if (404 === error.status) {
+                apiAdapter.setConfigs(group,{
+                    id: null,
+                    version: null,
+                    createdAt: null,
+                    value: INITIAL_SANDBOX_CONNECTION_FORM
+                }).then(() => getConfig().catch((error) => {
+                    setError({ message: error.message });
+                }))
+            }else{
+                setError({ message: error.message });
             }
         });
     }, []);

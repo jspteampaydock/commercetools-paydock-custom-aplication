@@ -19,7 +19,7 @@ import { ContentNotification } from '@commercetools-uikit/notifications';
 import PulseLoader from "react-spinners/PulseLoader";
 import CommerceToolsAPIAdapter from '../../commercetools-api-adaptor';
 import ValidationPaydockData from '../../validation-paydock-data';
-
+import { INITIAL_SANDBOX_CONNECTION_FORM } from '../../constants';
 
 const SandboxConnectionForm = () => {
     const apiAdapter = new CommerceToolsAPIAdapter();
@@ -325,8 +325,8 @@ const SandboxConnectionForm = () => {
         formik.handleChange(event);
     };
 
-    useEffect(() => {
-        apiAdapter.getConfigs(group).then((response) => {
+    const getConfig = () => {
+        return apiAdapter.getConfigs(group).then((response) => {
             setVersion(response.version ?? null);
             setId(response.id ?? null);
             setCreatedAt(response.createdAt ?? null);
@@ -335,8 +335,21 @@ const SandboxConnectionForm = () => {
                 let merged = { ...formik.values, ...response.value };
                 formik.setValues(merged);
             }
-        }).catch((error) => {
-            if (error.status !== 404) {
+        });
+    }
+
+    useEffect(() => {
+        getConfig().catch((error) => {
+            if (404 === error.status) {
+                apiAdapter.setConfigs(group,{
+                    id: null,
+                    version: null,
+                    createdAt: null,
+                    value: INITIAL_SANDBOX_CONNECTION_FORM
+                }).then(() => getConfig().catch((error) => {
+                    setError({ message: error.message });
+                }))
+            }else{
                 setError({ message: error.message });
             }
         });

@@ -1,22 +1,15 @@
+// eslint-disable-next-line import/extensions
+import config from '../custom-application-config.mjs';
+
 class CommerceToolsAPIAdapter {
     constructor() {
-        this.clientId = 'kjQW8-nXHq4CfKVdFzEjUl6c';
-        this.clientSecret = 'Z1B_FP71UbE8xwcdAy_Q5FR7ztHSZZRJ';
-        this.projectKey = 'paydockecomm';
-        this.region = 'europe-west1';
+        this.clientId = config.env.clientId;
+        this.clientSecret = config.env.clientSecret;
+        this.projectKey = config.env.projectKey;
+        this.region = config.env.region;
         this.accessToken = null;
         this.tokenExpirationTime = null;
-        this.arrayPaydockStatus = {
-            'paydock-pending': 'Pending via Paydock',
-            'paydock-paid': 'Paid via Paydock',
-            'paydock-authorize': 'Authorized via Paydock',
-            'paydock-cancelled': 'Cancelled via Paydock',
-            'paydock-refunded': 'Refunded via Paydock',
-            'paydock-p-refund': 'Partial refunded via Paydock',
-            'paydock-requested': 'Requested via Paydock',
-            'paydock-failed': 'Failed via Paydock',
-            'paydock-received': 'Received via Paydock',
-        };
+        this.arrayPaydockStatus = config.chargeStatuses;
     }
 
     async setAccessToken(accessToken, tokenExpirationInSeconds) {
