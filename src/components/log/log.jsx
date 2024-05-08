@@ -33,7 +33,6 @@ const LogsHistory = () => {
     useEffect(async () => {
         const apiAdapter = new CommerceToolsAPIAdapter();
         let logs = await apiAdapter.getLogs();
-        console.log(logs);
         setRows(logs);
         setCurrentRows(rows.slice(firstRowIndex, lastRowIndex))
     }, []);

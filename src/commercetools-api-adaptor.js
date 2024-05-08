@@ -220,7 +220,6 @@ class CommerceToolsAPIAdapter {
             };
             try {
                 let updateStatusResponse = await this.makeRequest('/payments/' + orderId, 'POST', requestData);
-                console.log(updateStatusResponse);
                 let paymentExtensionResponse = updateStatusResponse.custom?.fields?.PaymentExtensionResponse;
                 if (!paymentExtensionResponse) {
                     error = 'Error update status of payment';

@@ -263,7 +263,6 @@ const OrdersHistory = () => {
     useEffect(async () => {
         // Виконання запиту до сервера
         let orders = await apiAdapter.getOrders();
-        console.log('orders', orders)
         setRows(orders);
         setCurrentRows(rows.slice(firstRowIndex, lastRowIndex));
     }, []);

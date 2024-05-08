@@ -166,7 +166,6 @@ const WidgetConfigurationForm = () => {
                     value: values,
                 })
                   .then((response) => {
-                      console.log(response);
                       setVersion(response.version ?? null);
                       setId(response.id ?? null);
                       setCreatedAt(response.createdAt ?? null);

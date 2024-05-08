@@ -12,7 +12,6 @@ import Channels from './components/channels';
 
 const ApplicationRoutes = () => {
   const match = useRouteMatch();
-  console.log(match);
 
   /**
    * When using routes, there is a good chance that you might want to
