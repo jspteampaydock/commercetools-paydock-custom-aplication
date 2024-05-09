@@ -1,7 +1,7 @@
 // Make sure to import the helper functions from the `ssr` entry point.
 import { entryPointUriPathToPermissionKeys } from '@commercetools-frontend/application-shell/ssr';
 
-export const entryPointUriPath = 'paydock_app';
+export const entryPointUriPath = 'paydock-app';
 
 export const PERMISSIONS = entryPointUriPathToPermissionKeys(entryPointUriPath);
 
@@ -89,3 +89,42 @@ export const INITIAL_WIDGET_FORM = {
   widget_style_font_family: 'ui-rounded',
   widget_style_custom_element: '',
 };
+
+export const CHARGE_STATUSES =  {
+  'paydock-pending': 'Pending via Paydock',
+  'paydock-paid': 'Paid via Paydock',
+  'paydock-authorize': 'Authorized via Paydock',
+  'paydock-cancelled': 'Cancelled via Paydock',
+  'paydock-refunded': 'Refunded via Paydock',
+  'paydock-p-refund': 'Partial refunded via Paydock',
+  'paydock-requested': 'Requested via Paydock',
+  'paydock-failed': 'Failed via Paydock',
+  'paydock-received': 'Received via Paydock',
+}
+export const API_LIVE_URL = 'https://api.paydock.com';
+export const API_SANDBOX_URL = 'https://api-sandbox.paydock.com';
+
+export const NOTIFICATIONS = [
+  "standalone_fraud_check_success",
+  "standalone_fraud_check_in_review_approved",
+  "standalone_fraud_check_in_review_declined",
+  "standalone_fraud_check_in_review_async_approved",
+  "standalone_fraud_check_in_review_async_declined",
+  "fraud_check_transaction_in_review_declined",
+  "fraud_check_transaction_in_review_approved",
+  "fraud_check_failed",
+  "fraud_check_success",
+  "fraud_check_transaction_in_review_async_declined",
+  "fraud_check_transaction_in_review_async_approved",
+  "fraud_check_in_review_async_declined",
+  "fraud_check_in_review_async_approved",
+  "fraud_check_in_review",
+  "standalone_fraud_check_failed",
+  "standalone_fraud_check_in_review",
+  "refund_failure",
+  "refund_success",
+  "refund_requested",
+  "standalone_fraud_check_in_review_declined",
+  "transaction_success",
+  "transaction_failure"
+]

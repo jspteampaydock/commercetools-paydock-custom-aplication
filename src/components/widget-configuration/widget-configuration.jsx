@@ -328,7 +328,7 @@ const WidgetConfigurationForm = () => {
                             </CollapsiblePanel>
 
                             <CollapsiblePanel header="Bank accounts" isDefaultClosed={true}
-                                              className="collapsible-panel">
+                                              className="collapsible-panel hide">
                                 <Constraints.Horizontal max={'scale'}>
                                     <Spacings.Stack scale="xl">
 
@@ -402,7 +402,7 @@ const WidgetConfigurationForm = () => {
                                             onBlur={formik.handleBlur}
                                             isRequired={false}
                                         />
-
+                                        {/*
                                         <TextField
                                             name="payment_methods_wallets_afterpay_v2_title"
                                             title={intl.formatMessage(messages.paymentMethodsAfterpayV2Title)}
@@ -423,7 +423,7 @@ const WidgetConfigurationForm = () => {
                                             onBlur={formik.handleBlur}
                                             isRequired={false}
                                         />
-
+                                        */}
                                         <TextField
                                             name="payment_methods_wallets_paypal_title"
                                             title={intl.formatMessage(messages.paymentMethodsPaypalTitle)}

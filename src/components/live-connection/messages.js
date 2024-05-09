@@ -20,8 +20,8 @@ export default defineMessages({
     id: 'LiveConnection.credentialsPublicKeyTitle',
     defaultMessage: 'Public Key',
   },
-  credentialsPublicKeyDes: {
-    id: 'LiveConnection.credentialsPublicKeyDes',
+  credentialsPublicKeyDesc: {
+    id: 'LiveConnection.credentialsPublicKeyDesc',
     defaultMessage: 'Enter the API public key for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
   },
 
@@ -29,26 +29,25 @@ export default defineMessages({
     id: 'LiveConnection.credentialsSecretKeyTitle',
     defaultMessage: 'Secret Key',
   },
-  credentialsSecretKeyDes: {
-    id: 'LiveConnection.credentialsSecretKeyDes',
+  credentialsSecretKeyDesc: {
+    id: 'LiveConnection.credentialsSecretKeyDesc',
     defaultMessage: 'Enter the API secret key for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
   },
 
-  credentialsAccessKeyTit: {
-    id: 'LiveConnection.credentialsAccessKeyTit',
+  credentialsAccessKeyTitle: {
+    id: 'LiveConnection.credentialsAccessKeyTitle',
     defaultMessage: 'API Access Token',
   },
-  credentialsAccessKeyDes: {
-    id: 'LiveConnection.credentialsAccessKeyDes',
-    defaultMessage: 'Enter the API access token for authentication. This token is used to authorize transactions. It needs to be filled in only if API Public Key & API Secret Key is not entered.',
+  credentialsAccessKeyDesc: {
+    id: 'LiveConnection.credentialsAccessKeyDesc',
+    defaultMessage: 'Enter the Access Token for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
   },
-
   credentialsWidgetAccessKeyTitle: {
     id: 'LiveConnection.credentialsWidgetAccessKeyTitle',
     defaultMessage: 'Widget Access Token',
   },
-  credentialsWidgetAccessKeyDes: {
-    id: 'LiveConnection.credentialsWidgetAccessKeyDes',
+  credentialsWidgetAccessKeyDesc: {
+    id: 'LiveConnection.credentialsWidgetAccessKeyDesc',
     defaultMessage: 'Enter the widget access token for authentication. This token is used to authorize widget transactions. It needs to be filled in only if API Public Key & API Secret Key is not entered.',
   },
   selectSandboxModeTitle: {

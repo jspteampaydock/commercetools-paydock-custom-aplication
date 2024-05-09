@@ -20,8 +20,8 @@ export default defineMessages({
     id: 'SandboxConnection.credentialsPublicKeyTitle',
     defaultMessage: 'Public Key',
   },
-  credentialsPublicKeyDes: {
-    id: 'SandboxConnection.credentialsPublicKeyDes',
+  credentialsPublicKeyDesc: {
+    id: 'SandboxConnection.credentialsPublicKeyDesc',
     defaultMessage: 'Enter the API public key for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
   },
 
@@ -29,16 +29,16 @@ export default defineMessages({
     id: 'SandboxConnection.credentialsSecretKeyTitle',
     defaultMessage: 'Secret Key',
   },
-  credentialsSecretKeyDes: {
-    id: 'SandboxConnection.credentialsSecretKeyDes',
+  credentialsSecretKeyDesc: {
+    id: 'SandboxConnection.credentialsSecretKeyDesc',
     defaultMessage: 'Enter the API secret key for the live environment. This key is used for authentication to ensure secure communication with the Payment Gateway.',
   },
-  credentialsAccessKeyTit: {
-    id: 'SandboxConnection.credentialsAccessKeyTit',
+  credentialsAccessKeyTitle: {
+    id: 'SandboxConnection.credentialsAccessKeyTitle',
     defaultMessage: 'API Access Token',
   },
-  credentialsAccessKeyDes: {
-    id: 'SandboxConnection.credentialsAccessKeyDes',
+  credentialsAccessKeyDesc: {
+    id: 'SandboxConnection.credentialsAccessKeyDesc',
     defaultMessage: 'Enter the API access token for authentication. This token is used to authorize transactions. It needs to be filled in only if API Public Key API Secret Key is not entered.',
   },
 

@@ -1,4 +1,5 @@
-# Paydock commercetools custom application
+# dev-paydock-commercetools-custom-application
+
 
 
 ## Getting started
@@ -14,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab.com/jsp8795506/paydock-commercetools-custom-application.git
+git remote add origin https://gitlab.com/jsp8795506/dev-paydock-commercetools-custom-application.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab.com/jsp8795506/paydock-commercetools-custom-application/-/settings/integrations)
+- [ ] [Set up project integrations](https://gitlab.com/jsp8795506/dev-paydock-commercetools-custom-application/-/settings/integrations)
 
 ## Collaborate with your team
 
